@@ -1,33 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/basic.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../blocs/blocs.dart';
+
 class MapView extends StatelessWidget {
+  final Set<Polyline> polylines;
   final LatLng initialLocation;
-  const MapView({super.key, required this.initialLocation});
+  const MapView(
+      {super.key, required this.initialLocation, required this.polylines});
 
   @override
   Widget build(BuildContext context) {
+    final mapBloc = BlocProvider.of<MapBloc>(context);
     final CameraPosition initialCameraPosition =
         CameraPosition(target: initialLocation, zoom: 15);
-    final size=MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return SizedBox(
-      width: size.width,
-      height: size.height,
-      child: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        compassEnabled: false,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false,
-        zoomControlsEnabled: false,
+        width: size.width,
+        height: size.height,
+        child: Listener(
+          //Rodeo al widget GoogleMap con listener, para poder escuchar cuando mueve la camara,
+          //ya que onCamaraMove de GoogleMap no nos sirve.
+          //onPointerMove nos viene mejor.
+          onPointerMove: (pointerMoveEvent) => mapBloc.add(StopFollowingUser()),
+          child: GoogleMap(
+            initialCameraPosition: initialCameraPosition,
+            compassEnabled: false,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            onMapCreated: (mapController) =>
+                mapBloc.add(onMapInitilializedEvent(mapController)),
+            polylines: polylines,
+            //Markers
 
-        //Markers
-        //Polylines
-        //Cuando se mueve el mapa
-      )
-    );
-    
+            //Cuando se mueve el mapa
+          ),
+        ));
   }
 }
