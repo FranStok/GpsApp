@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:gps_app/blocs/blocs.dart';
 import 'package:gps_app/views/views.dart';
-import 'package:gps_app/widgets/btn_toggle_route.dart';
 import 'package:gps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
@@ -44,15 +43,18 @@ class _MapScreenState extends State<MapScreen> {
           return BlocBuilder<MapBloc, MapState>(
             builder: (context, mapState) {
               Map<String, Polyline> polylines = Map.from(mapState.polylines);
-              if (!mapState.showRoute)
+              if (!mapState.showRoute) {
                 polylines.removeWhere((key, value) => key == "myRoute");
+              }
               return SingleChildScrollView(
                 child: Stack(
                   children: [
                     MapView(
                       initialLocation: locationState.lastLocation!,
                       polylines: polylines.values.toSet(),
-                    )
+                    ),
+                    const SearchBar(),
+                    const ManualMarker()
                   ],
                 ),
               );

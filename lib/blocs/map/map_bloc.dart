@@ -16,6 +16,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final LocationBloc locationBloc;
   GoogleMapController? _mapController;
   StreamSubscription<LocationState>? locationSubscription;
+  LatLng? mapCenter;
 
   MapBloc({required this.locationBloc}) : super(const MapState()) {
     //2 maneras de hacerlo

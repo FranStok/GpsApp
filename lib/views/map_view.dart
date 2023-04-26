@@ -35,7 +35,9 @@ class MapView extends StatelessWidget {
             polylines: polylines,
             //Markers
 
-            //Cuando se mueve el mapa
+            //Cuando se mueve el mapa. Lo uso para pasar la end location de un marker personal.
+            //Target es la latitud y la longitud
+            onCameraMove:(position)=> mapBloc.mapCenter=position.target,
           ),
         ));
   }
