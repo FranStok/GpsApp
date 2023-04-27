@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:gps_app/blocs/blocs.dart';
+import 'package:gps_app/models/models.dart';
 import '../../themes/themes.dart ';
 
 part 'map_event.dart';
@@ -31,6 +32,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<UpdateUserPolylines>(_UpdateUserPolynes);
     on<OnToggleRoute>(
         (event, emit) => emit(state.copyWith(showRoute: !state.showRoute)));
+    on<DisplayPolylinesEvent>(
+        (event, emit) => emit(state.copyWith(polylines: event.polylines)));
 
     //El stream escucha cada vez que hay un cambio de estado (asumo yo)
     locationSubscription = locationBloc.stream.listen((locationState) {
@@ -65,6 +68,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     //Si no existe "myRoute", lo crea, sino lo remplaza por el nuevo myRoute
     currentPolylines["myRoute"] = myRoute;
     emit(state.copyWith(polylines: currentPolylines));
+  }
+
+  Future drawRoutePolyline(RouteDestination destination) async {
+    final route = Polyline(
+        polylineId: const PolylineId("route"),
+        color: Colors.black,
+        width: 5,
+        points: destination.points,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap);
+
+    final currentPolylines = Map<String, Polyline>.from(state.polylines);
+    currentPolylines["route"] = route;
+
+    add(DisplayPolylinesEvent(currentPolylines));
   }
 
   void moveCamera(LatLng newLocation) {

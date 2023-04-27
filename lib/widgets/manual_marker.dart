@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:animate_do/animate_do.dart';
 
 import '../blocs/blocs.dart';
+import 'package:gps_app/helpers/helpers.dart';
 
 class ManualMarker extends StatelessWidget {
   const ManualMarker({super.key});
@@ -59,11 +60,17 @@ class _ManualMarkerBody extends StatelessWidget {
                 color: Colors.black,
                 elevation: 0,
                 shape: const StadiumBorder(),
-                onPressed: ()async{
+                onPressed: () async {
                   final start = locationBloc.state.lastLocation;
                   final end = mapBloc.mapCenter;
-                  if (start == null || end==null) return;
-                  await searchBloc.getCoordsStartToEnd(start, end);
+                  if (start == null || end == null) return;
+                  searchBloc.add(OnDeactivateManualMarkerEvent());
+                  showLoadingMessage(context);
+                  final navigator = Navigator.of(context); // Si no hago esto, falla por el tema context y async.
+                  final destination =
+                      await searchBloc.getCoordsStartToEnd(start, end);
+                  await mapBloc.drawRoutePolyline(destination);
+                  navigator.pop(); //Cierra el loadingMessage
                 },
                 child: const Text("Confirmar destino",
                     style: TextStyle(
