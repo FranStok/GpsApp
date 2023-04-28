@@ -1,9 +1,10 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:gps_app/delegates/delegates.dart';
 import 'package:gps_app/models/models.dart';
-
 import '../blocs/blocs.dart';
 
 class SearchBar extends StatelessWidget {
@@ -22,13 +23,19 @@ class SearchBar extends StatelessWidget {
 }
 
 class _SearchBarBody extends StatelessWidget {
-  const _SearchBarBody({super.key});
+  const _SearchBarBody();
 
-  void onSearchResult(BuildContext context, SearchResult result) {
+  Future onSearchResult(BuildContext context, SearchResult result) async {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-
-    if (result.manual) {
+    if (result.manual) { //Marcador manual
       searchBloc.add(OnActivateManualMarkerEvent());
+    }
+    if (result.position != null) { //Marcador de busqueda.
+      final mapBloc=BlocProvider.of<MapBloc>(context);
+      final start = BlocProvider.of<LocationBloc>(context).state.lastLocation!;
+      final end = result.position!;
+      final destination = await searchBloc.getCoordsStartToEnd(start, end);
+      await mapBloc.drawRoutePolyline(destination);
     }
   }
 
