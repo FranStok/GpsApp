@@ -6,13 +6,13 @@ import 'dart:convert';
 
 class PlacesResponse {
   final String type;
-  final List<String> query;
+  // final List<String> query;
   final List<Feature> features;
   final String attribution;
 
   PlacesResponse({
     required this.type,
-    required this.query,
+    // required this.query,
     required this.features,
     required this.attribution,
   });
@@ -24,7 +24,7 @@ class PlacesResponse {
 
   factory PlacesResponse.fromJson(Map<String, dynamic> json) => PlacesResponse(
         type: json["type"],
-        query: List<String>.from(json["query"].map((x) => x)),
+        // query: List<String>.from(json["query"].map((x) => x)),
         features: List<Feature>.from(
             json["features"].map((x) => Feature.fromJson(x))),
         attribution: json["attribution"],
@@ -32,7 +32,7 @@ class PlacesResponse {
 
   Map<String, dynamic> toJson() => {
         "type": type,
-        "query": List<dynamic>.from(query.map((x) => x)),
+        // "query": List<dynamic>.from(query.map((x) => x)),
         "features": List<dynamic>.from(features.map((x) => x.toJson())),
         "attribution": attribution,
       };

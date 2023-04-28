@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:gps_app/blocs/blocs.dart';
+import 'package:gps_app/helpers/helpers.dart';
 import 'package:gps_app/models/models.dart';
 import '../../themes/themes.dart ';
 
@@ -32,8 +33,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<UpdateUserPolylines>(_UpdateUserPolynes);
     on<OnToggleRoute>(
         (event, emit) => emit(state.copyWith(showRoute: !state.showRoute)));
-    on<DisplayPolylinesEvent>(
-        (event, emit) => emit(state.copyWith(polylines: event.polylines)));
+    on<DisplayPolylinesEvent>((event, emit) => emit(
+        state.copyWith(polylines: event.polylines, markers: event.markers)));
 
     //El stream escucha cada vez que hay un cambio de estado (asumo yo)
     locationSubscription = locationBloc.stream.listen((locationState) {
@@ -79,10 +80,52 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         startCap: Cap.roundCap,
         endCap: Cap.roundCap);
 
+    //kilometros a metro y hago redondeo.
+    double km = destination.distance / 1000;
+    km = (km * 100).floorToDouble() / 100;
+
+    double tripDuration =
+        ((destination.duration / 60) * 100).floorToDouble() / 100;
+
+    //Custom markers
+
+
+    //Creacion de markers:
+    final startMarker = Marker(
+        markerId: const MarkerId("start"),
+        anchor: const Offset(0.06, 0.9),
+        position: destination.points.first,
+        // icon: await getAssetImage()
+        icon: await getStartCustomMarker(tripDuration.toInt(), "Mi ubicacion"),
+        // infoWindow: InfoWindow(
+        //   title: "Inicio",
+        //   snippet: "Kms: $km, duracion: $tripDuration minutos",
+        // )
+    );
+    final endMarker = Marker(
+        markerId: const MarkerId("end"),
+        position: destination.points.last,
+        // icon: await getNetworkImageMarker(),
+        icon: await getEndCustomMarker(km.toInt(), destination.endPlace.text),
+        //Muevo un poco el icon
+         anchor: const Offset(0.5, 0.9),
+        // infoWindow: InfoWindow(
+        //   title: destination.endPlace.text,
+        //   snippet: destination.endPlace.placeName,
+        // )
+    );
+
     final currentPolylines = Map<String, Polyline>.from(state.polylines);
     currentPolylines["route"] = route;
+    final currentMarkers = Map<String, Marker>.from(state.markers);
+    currentMarkers["start"] = startMarker;
+    currentMarkers["end"] = endMarker;
 
-    add(DisplayPolylinesEvent(currentPolylines));
+    add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
+
+    //Estp controla que infoWindow se muestra primero.
+    // await Future.delayed(const Duration(milliseconds: 300));
+    // _mapController?.showMarkerInfoWindow(const MarkerId("start"));
   }
 
   void moveCamera(LatLng newLocation) {

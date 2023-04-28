@@ -8,7 +8,7 @@ final accessToken =
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     options.queryParameters.addAll({
       "access_token": accessToken,
-      "limit":7,
+      // "limit":7,
       "proximity":"-57.56176196603262,-38.02300270894258"
     });
     super.onRequest(options, handler);

@@ -6,9 +6,10 @@ import '../blocs/blocs.dart';
 
 class MapView extends StatelessWidget {
   final Set<Polyline> polylines;
+  final Set<Marker> markers;
   final LatLng initialLocation;
   const MapView(
-      {super.key, required this.initialLocation, required this.polylines});
+      {super.key, required this.initialLocation, required this.polylines, required this.markers});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class MapView extends StatelessWidget {
             onMapCreated: (mapController) =>
                 mapBloc.add(onMapInitilializedEvent(mapController)),
             polylines: polylines,
-            //Markers
+            markers: markers,
 
             //Cuando se mueve el mapa. Lo uso para pasar la end location de un marker personal.
             //Target es la latitud y la longitud
